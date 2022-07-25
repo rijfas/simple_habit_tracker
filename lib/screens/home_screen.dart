@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:simple_habit_tracker/providers/habit_provider.dart';
-import 'package:simple_habit_tracker/screens/widgets/habit_tile.dart';
+import '../providers/habit_provider.dart';
+import 'widgets/habit_tile.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -29,13 +30,26 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
       ),
       body: Consumer<HabitProvider>(
-        builder: (context, provider, child) => ListView.builder(
-          itemBuilder: (context, index) => HabitTile(
-            habit: provider.habits[index],
-          ),
-          itemCount: provider.habits.length,
-        ),
-      ),
+          builder: (context, provider, child) => provider.habits.isEmpty
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                      Center(
+                        child: SvgPicture.asset(
+                          'assets/svg/empty.svg',
+                          height: 150,
+                        ),
+                      ),
+                      const SizedBox(height: 30.0),
+                      const Text('Click + to add a new habit')
+                    ])
+              : ListView.builder(
+                  itemBuilder: (context, index) => HabitTile(
+                    habit: provider.habits[index],
+                  ),
+                  itemCount: provider.habits.length,
+                )),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           final controller = TextEditingController();
@@ -69,9 +83,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       TextButton(
                           onPressed: () {
-                            context.read<HabitProvider>().addHabit(
-                                title: controller.value.text, time: time);
-                            Navigator.of(context).pop();
+                            if (controller.value.text.isNotEmpty) {
+                              context.read<HabitProvider>().addHabit(
+                                  title: controller.value.text, time: time);
+                              Navigator.of(context).pop();
+                            }
                           },
                           child: Text(
                             'Save',

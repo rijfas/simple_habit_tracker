@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:simple_habit_tracker/providers/habit_provider.dart';
-import 'package:simple_habit_tracker/screens/home_screen.dart';
+import 'providers/habit_provider.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());

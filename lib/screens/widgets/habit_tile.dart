@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:simple_habit_tracker/models/habit.dart';
+import '../../models/habit.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
-import 'package:simple_habit_tracker/providers/habit_provider.dart';
+import '../../providers/habit_provider.dart';
+import 'package:flutter/cupertino.dart';
 
 class HabitTile extends StatefulWidget {
   const HabitTile({
@@ -155,11 +156,13 @@ class _HabitTileState extends State<HabitTile> {
                               children: [
                                 TextButton(
                                     onPressed: () {
-                                      context.read<HabitProvider>().editHabit(
-                                          id: widget.habit.id,
-                                          title: controller.value.text,
-                                          time: time);
-                                      Navigator.of(context).pop();
+                                      if (controller.value.text.isNotEmpty) {
+                                        context.read<HabitProvider>().editHabit(
+                                            id: widget.habit.id,
+                                            title: controller.value.text,
+                                            time: time);
+                                        Navigator.of(context).pop();
+                                      }
                                     },
                                     child: Text(
                                       'Save',
