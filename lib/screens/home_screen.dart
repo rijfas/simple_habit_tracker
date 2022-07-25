@@ -1,8 +1,23 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:simple_habit_tracker/providers/habit_provider.dart';
+import 'package:simple_habit_tracker/screens/widgets/habit_tile.dart';
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    context.read<HabitProvider>().loadHabits();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +28,18 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.grey.shade900,
         centerTitle: true,
       ),
-      body: ListView.builder(
-        itemBuilder: (context, index) => const HabitTile(),
-        itemCount: 5,
+      body: Consumer<HabitProvider>(
+        builder: (context, provider, child) => ListView.builder(
+          itemBuilder: (context, index) => HabitTile(
+            habit: provider.habits[index],
+          ),
+          itemCount: provider.habits.length,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          final controller = TextEditingController();
+          Duration time = const Duration(minutes: 5);
           showDialog(
             context: context,
             builder: (context) => Dialog(
@@ -28,6 +49,7 @@ class HomeScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: TextField(
+                      controller: controller,
                       decoration: InputDecoration(
                           hintText: 'Habit Title',
                           focusColor: Colors.grey.shade900),
@@ -39,20 +61,24 @@ class HomeScreen extends StatelessWidget {
                   ),
                   CupertinoTimerPicker(
                     initialTimerDuration: const Duration(minutes: 5),
-                    onTimerDurationChanged: (value) => {},
+                    onTimerDurationChanged: (value) => time = value,
                     mode: CupertinoTimerPickerMode.hm,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<HabitProvider>().addHabit(
+                                title: controller.value.text, time: time);
+                            Navigator.of(context).pop();
+                          },
                           child: Text(
                             'Save',
                             style: TextStyle(color: Colors.grey.shade900),
                           )),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.of(context).pop(),
                           child: Text(
                             'Cancel',
                             style: TextStyle(color: Colors.red.shade300),
@@ -69,60 +95,6 @@ class HomeScreen extends StatelessWidget {
         child: const Icon(
           Icons.add,
           color: Colors.white,
-        ),
-      ),
-    );
-  }
-}
-
-class HabitTile extends StatelessWidget {
-  const HabitTile({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5.0,
-      margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          children: [
-            Stack(
-              alignment: AlignmentDirectional.center,
-              children: [
-                Icon(
-                  Icons.play_arrow,
-                  color: Colors.grey.shade900,
-                ),
-                CircularProgressIndicator(
-                  value: 0.5,
-                  color: Colors.grey.shade900,
-                )
-              ],
-            ),
-            const SizedBox(width: 10.0),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Habbit title',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0,
-                  ),
-                ),
-                const SizedBox(height: 2.5),
-                Text(
-                  '00:05:00 = 20%',
-                  style: TextStyle(color: Colors.grey.shade500),
-                )
-              ],
-            ),
-            const Spacer(),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.edit))
-          ],
         ),
       ),
     );

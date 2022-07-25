@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:simple_habit_tracker/providers/habit_provider.dart';
 import 'package:simple_habit_tracker/screens/home_screen.dart';
 
 void main() {
@@ -10,8 +12,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: HomeScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => HabitProvider(),
+      child: const MaterialApp(
+        home: HomeScreen(),
+      ),
     );
   }
 }
